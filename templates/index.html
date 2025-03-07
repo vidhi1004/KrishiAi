@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Krishi AI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            text-align: left;
+        }
+        input, button {
+            display: block;
+            width: 90%;
+            margin: 10px auto;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #219150;
+        }
+        p {
+            font-size: 18px;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Krishi AI - Crop & Disease Prediction</h1>
+
+    <h2>🌱 Crop Recommendation</h2>
+    <form id="cropForm">
+        <input type="number" placeholder="N (Nitrogen)" id="N" required>
+        <input type="number" placeholder="P (Phosphorus)" id="P" required>
+        <input type="number" placeholder="K (Potassium)" id="K" required>
+        <input type="number" placeholder="Temperature (°C)" id="temperature" required>
+        <input type="number" placeholder="Humidity (%)" id="humidity" required>
+        <input type="number" placeholder="pH Level" id="ph" required>
+        <input type="number" placeholder="Rainfall (mm)" id="rainfall" required>
+        <button type="submit">🌾 Recommend Crop</button>
+    </form>
+    <p id="cropResult"></p>
+
+    <h2>🍂 Plant Disease Detection</h2>
+    <input type="file" id="imageUpload">
+    <button onclick="detectDisease()">📷 Detect Disease</button>
+    <p id="diseaseResult"></p>
+
+    <script>
+        document.getElementById("cropForm").onsubmit = function(event) {
+            event.preventDefault();
+            fetch("/recommend", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    N: document.getElementById("N").value,
+                    P: document.getElementById("P").value,
+                    K: document.getElementById("K").value,
+                    temperature: document.getElementById("temperature").value,
+                    humidity: document.getElementById("humidity").value,
+                    ph: document.getElementById("ph").value,
+                    rainfall: document.getElementById("rainfall").value
+                })
+            })
+            .then(response => response.json())
+            .then(data => document.getElementById("cropResult").innerText = "Recommended Crop: " + data["Recommended Crop"])
+            .catch(error => console.error("Error:", error));
+        };
+
+        function detectDisease() {
+            let fileInput = document.getElementById("imageUpload").files[0];
+            if (!fileInput) {
+                alert("Please upload an image first!");
+                return;
+            }
+            let formData = new FormData();
+            formData.append("file", fileInput);
+
+            fetch("/detect-disease", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => document.getElementById("diseaseResult").innerText = "Detected Disease: " + data["Detected Disease"])
+            .catch(error => console.error("Error:", error));
+        }
+    </script>
+</body>
+</html>
