@@ -1,7 +1,3 @@
-# Krishi AI - Crop Recommendation & Disease Detection
-
-## Training Script - train.py
-
 import numpy as np
 import pandas as pd
 import tensorflow as tf
